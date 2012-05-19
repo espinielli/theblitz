@@ -18,8 +18,11 @@ The times are for 7th Sep 1940.
 The addresses can be reverse geocoded using [nominatim-python][] a python
 library for [Nominatim][].
 For example the lookup of the 73rd entry in [the data][] file, 
+
 > Royal Arsenal, Woolwich, SE18, London, UK
+
 gives
+
 > >>> import nominatim
 > >>> 
 > >>> nominatim.Geocoder().geocode('Royal Arsenal, Woolwich, SE18, London, UK')
