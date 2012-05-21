@@ -25,9 +25,39 @@ gives
 
 ```python
 >>> import nominatim
->>>
->>> nominatim.Geocoder().geocode('Royal Arsenal, Woolwich, SE18, London, UK')
-[{'display_name': 'Royal Arsenal Woolwich Pier, Woolwich, London Borough of Greenwich, Greater London, London, England, SE18, United Kingdom', 'place_id': '2112469544', 'lon': '0.070824870400824', 'lat': '51.4956072184614', 'osm_type': 'way', 'licence': 'Data Copyright OpenStreetMap Contributors, Some Rights Reserved. CC-BY-SA 2.0.', 'osm_id': '103128361', 'boundingbox': ['51.4951553344727', '51.495906829834', '0.0705746933817863', '0.0711841061711311'], 'type': 'pedestrian', 'class': 'highway', 'address': {'city': 'London Borough of Greenwich', 'state_district': 'London', 'suburb': 'Woolwich', 'country': 'United Kingdom', 'county': 'Greater London', 'pedestrian': 'Royal Arsenal Woolwich Pier', 'state': 'England', 'postcode': 'SE18', 'country_code': 'gb'}}]
+>>> import json
+>>> address_lookup=nominatim.Geocoder().geocode('Royal Arsenal, Woolwich, SE18, London, UK')
+>>> print json.dumps(address_lookup)
+[
+    {
+        "display_name": "Royal Arsenal Woolwich Pier, Woolwich, London Borough of Greenwich, Greater London, London, England, SE18, United Kingdom", 
+        "place_id": "2112469544", 
+        "lon": "0.070824870400824", 
+        "lat": "51.4956072184614", 
+        "osm_type": "way", 
+        "licence": "Data Copyright OpenStreetMap Contributors, Some Rights Reserved. CC-BY-SA 2.0.", 
+        "osm_id": "103128361", 
+        "boundingbox": [
+            "51.4951553344727", 
+            "51.495906829834", 
+            "0.0705746933817863", 
+            "0.0711841061711311"
+        ], 
+        "type": "pedestrian", 
+        "class": "highway", 
+        "address": {
+            "city": "London Borough of Greenwich", 
+            "state_district": "London", 
+            "suburb": "Woolwich", 
+            "country": "United Kingdom", 
+            "county": "Greater London", 
+            "pedestrian": "Royal Arsenal Woolwich Pier", 
+            "state": "England", 
+            "postcode": "SE18", 
+            "country_code": "gb"
+        }
+    }
+]
 ```
 
 Timeline
