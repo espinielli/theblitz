@@ -64,7 +64,9 @@ gives
 
 ### Geocoding via Google Maps v3 ###
 It turns out that a lot of addresses are not geocoded by Nominatim,
-for example entry 225 '128 Aylward Street, Stepney E1, London, UK'.
+for example entry 225 
+> 128 Aylward Street, Stepney E1, London, UK
+
 So I tried Google Maps v3 using [pygeocoder][] library:
 ```python
 >>> import pygeocoder as geo
@@ -157,11 +159,14 @@ So I tried Google Maps v3 using [pygeocoder][] library:
 But even Google Maps fails, for example on entry 224
 > 12 Jewel Street, Stepney E1, London, UK
 
+This street probably does not exist any more.
+But maybe you can find it on [the map of the time][London1940]...
+
 ### Geocoding using Google Fusion Table ###
 In the Guardian blog, there is a link to geocoding the bomb drops in
 the data set using Google Fusion Table. It seems this technology has
 no problems with the entries both Nominatim and Google Maps failed to
-geocode...
+geocode...but when I checked the 
 
 
 # Timeline #
@@ -197,3 +202,7 @@ http://d3js.org/
 [TWoN]:
 http://bost.ocks.org/mike/nations/
 "The Wealth of Nations "
+
+[London1940]:
+http://www.maps-of-london.com/
+"London map ca. 1940"
