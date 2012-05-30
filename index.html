@@ -43,7 +43,23 @@
     <div id="map"></div>
     <script type="text/javascript">
       // London...
-      var thespot = {"lat": 51.5081, "lon": -0.1280}
+      var thespot = {"lat": 51.49463582758311, "lon": -0.04628918457023179 }
+
+      var minutes = function(t) {
+          // transform a time of day string [H]H:MM, i.e. "1:08"
+          // in minutes from midnight, i.e. 68.
+          reggie = /(\d):(\d{2})/g;
+          t = reggie.exec(t);
+          return parseInt(t[1]) * 60 + parseInt(t[2])
+      };
+
+      // the first day of the blitz started after 16:44, the time
+      // German airplanes entered British airspance.
+      //
+      // The data entries should be shifted accordingly and the start of
+      // the animation should be minute 1004, the first drop at 16:57 will
+      // be 13 minutes later (data[84]) and continue into next day:
+      // (24*60*2-m-1004)%24*60
 
       // Create the Google Map
       var map = new google.maps.Map(d3.select("#map").node(), {
