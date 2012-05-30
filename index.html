@@ -3,103 +3,103 @@
   <head>
     <title>The first day of the Blitz</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
-    <script src="http://d3js.org/d3.v2.js"></script>
+    <script type="text/javascript"
+            src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript"
+            src="http://d3js.org/d3.v2.min.js"></script>
     <style type="text/css">
+    html, body, #map {
+        width:   100%;
+        height:  100%;
+        margin:  0;
+        padding: 0;
+    }
 
-html, body, #map {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+    .drops, .drops svg {
+        position: absolute;
+    }
 
-.drops, .drops svg {
-  position: absolute;
-}
+    .drops svg {
+        width: 60px;
+        height: 20px;
+        padding-right: 100px;
+        font: 10px sans-serif;
+        /* we need rather many text shadows to outline the text in enough contrast */
+        text-shadow: 0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF,
+                     0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF,
+                     0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF, 0 0 1px #FFF,
+                     0 0 2px #FFF, 0 0 2px #FFF, 0 0 2px #FFF, 0 0 2px #FFF,
+                     0 0 2px #FFF, 0 0 2px #FFF, 0 0 2px #FFF, 0 0 2px #FFF;
+    }
 
-.drops svg {
-  width: 60px;
-  height: 20px;
-  padding-right: 100px;
-  font: 10px sans-serif;
-}
-
-.drops circle {
-  fill: brown;
-  stroke: black;
-  stroke-width: 1.5px;
-}
-
+    .drops circle {
+        fill: red;
+        stroke: black;
+        stroke-width: 1.5px;
+    }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <script type="text/javascript">
+      // London...
+      var thespot = {"lat": 51.5081, "lon": -0.1280}
 
-// Various accessors that specify the four dimensions of data to visualize.
-function lat(d) { return d.location.lat; }
-function lon(d) { return d.location.lon; }
-function address(d) {return d.location.display_name;}
-function time(d) {return d.time;}
+      // Create the Google Map
+      var map = new google.maps.Map(d3.select("#map").node(), {
+          zoom: 12,
+          center: new google.maps.LatLng(thespot.lat, thespot.lon),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
 
-// Create the Google Map…
-var london = {"lat": 51.5081, "lon": -0.1280}
-var map = new google.maps.Map(d3.select("#map").node(), {
-  zoom: 8,
-  center: new google.maps.LatLng(london.lat, london.lon),
-  mapTypeId: google.maps.MapTypeId.TERRAIN
-});
+      // Load the station data. When the data comes back, create an overlay.
+      d3.json("drops.json", function(data) {
+          var overlay = new google.maps.OverlayView();
 
-// Load the bomb drops data. When the data comes back, create an overlay.
-d3.json("drops.json", function(data) {
-  var overlay = new google.maps.OverlayView();
+          // Add the container when the overlay is added to the map.
+          overlay.onAdd = function() {
+              var layer = d3.select(this.getPanes().overlayLayer).append("div")
+                  .attr("class", "drops");
 
-  // Add the container when the overlay is added to the map.
-  overlay.onAdd = function() {
-    var layer = d3.select(this.getPanes().overlayLayer).append("div")
-        .attr("class", "drops");
+              // Draw each marker as a separate SVG element.
+              // We could use a single SVG, but what size would it have?
+              overlay.draw = function() {
+                  var projection = this.getProjection(),
+                      padding = 10;
 
-    // Draw each marker as a separate SVG element.
-    // We could use a single SVG, but what size would it have?
-    overlay.draw = function() {
-      var projection = this.getProjection(),
-          padding = 10;
+                  var marker = layer.selectAll("svg")
+                      .data(d3.entries(data))
+                      .each(transform) // update existing markers
+                          .enter().append("svg:svg")
+                      .each(transform)
+                          .attr("class", "marker");
 
-      var marker = layer.selectAll("svg")
-          .data(d3.entries(data))
-          .each(transform) // update existing markers
-        .enter().append("svg:svg")
-          .each(transform)
-          .attr("class", "marker");
+                  // Add a circle.
+                  marker.append("svg:circle")
+                      .attr("r", 4.5)
+                      .attr("cx", padding)
+                      .attr("cy", padding);
 
-      // Add a circle.
-      marker.append("svg:circle")
-          .attr("r", 4.5)
-          .attr("cx", padding)
-          .attr("cy", padding);
+                  // Add a label.
+                  marker.append("svg:text")
+                      .attr("x", padding + 7)
+                      .attr("y", padding)
+                      .attr("dy", ".31em")
+                      .text(function(d) { return d.value.time; });
 
-      // Add a label.
-      marker.append("svg:text")
-          .attr("x", padding + 7)
-          .attr("y", padding)
-          .attr("dy", ".31em")
-          .text(address(d));
+                  function transform(d) {
+                      d = new google.maps.LatLng(d.value.location.lat, d.value.location.lon);
+                      d = projection.fromLatLngToDivPixel(d);
+                      return d3.select(this)
+                          .style("left", (d.x - padding) + "px")
+                          .style("top",  (d.y - padding) + "px");
+                  }
+              };
+          };
 
-      function transform(d) {
-        d = new google.maps.LatLng(lat(d), lon(d));
-        d = projection.fromLatLngToDivPixel(d);
-        return d3.select(this)
-            .style("left", (d.x - padding) + "px")
-            .style("top", (d.y - padding) + "px");
-      }
-    };
-  };
-
-  // Bind our overlay to the map…
-  overlay.setMap(map);
-});
-
+          // Bind our overlay to the map
+          overlay.setMap(map);
+      });
     </script>
   </body>
 </html>
