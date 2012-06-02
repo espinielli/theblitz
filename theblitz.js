@@ -31,6 +31,7 @@ var map = new google.maps.Map(d3.select("#map").node(), {
     mapTypeId: google.maps.MapTypeId.ROADMAP
 });
 
+
 // Load the station data. When the data comes back, create an overlay.
 d3.json("drops.json", function(data) {
     var overlay = new google.maps.OverlayView();
@@ -48,6 +49,16 @@ d3.json("drops.json", function(data) {
           function key(d) {
             return d.order;
           }
+
+          function makegrey(d) {
+            d3.select(this)
+              .transition()
+              .delay(0)
+              .duration(1000)
+              .attr("r", 3)
+              .style("fill", "grey");
+          }
+
             var marker = layer.selectAll("svg")
             .data(data, key)
                 .each(transform) // update existing markers
@@ -57,13 +68,15 @@ d3.json("drops.json", function(data) {
 
             // Add a circle.
             marker.append("svg:circle")
-                .attr("r", 4.5)
-                .attr("cx", padding)
-                .attr("cy", padding)
-              .transition()
+              .attr("r", 0)
+              .attr("cx", padding)
+              .attr("cy", padding)
+            .transition()
             .delay(function(d) {return 20 * minutes(d) + 30;})
-                .duration(2000)
-                .style("fill", "black");;
+            .duration(2000)
+            .attr("r", 4.5)
+            .style("fill", "black")
+            .each("end", makegrey);
 
             // Add a label.
             // marker.append("svg:text")
