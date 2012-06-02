@@ -2,13 +2,6 @@
 // London...
 var thespot = {"lat": 51.49463582758311, "lon": -0.04628918457023179 }
 
-var minutes = function(t) {
-    // transform a time of day string [H]H:MM, i.e. "1:08"
-    // in minutes from midnight, i.e. 68.
-    reggie = /(\d):(\d{2})/g;
-    t = reggie.exec(t);
-    return parseInt(t[1]) * 60 + parseInt(t[2])
-};
 
 // the first day of the blitz started after 16:44, the time
 // German airplanes entered British airspance.
@@ -16,7 +9,19 @@ var minutes = function(t) {
 // The data entries should be shifted accordingly and the start of
 // the animation should be minute 1004, the first drop at 16:57 will
 // be 13 minutes later (data[84]) and continue into next day:
-// (24*60*2-m-1004)%24*60
+// time=h:m
+// minutes from start of raid: (h*60+m - 1004) % 1440
+var minutes = function(d) {
+  // transform a time of day string [H]H:MM, i.e. "1:08"
+  // in minutes from midnight, i.e. 68.
+  reggie = /(\d):(\d{2})/g;
+  t = reggie.exec(d.value.time);
+  t = parseInt(t[1]) * 60 + parseInt(t[2]);
+  // shift so that 16:44 is the start of time
+  // (1440 = 24 * 60, the number of minutes in 1 day)
+  t = (2*(t + 1440 - 1004)) % 1440;
+  return 20 * t + 30;
+};
 
 // Create the Google Map
 var map = new google.maps.Map(d3.select("#map").node(), {
@@ -51,14 +56,18 @@ d3.json("drops.json", function(data) {
             marker.append("svg:circle")
                 .attr("r", 4.5)
                 .attr("cx", padding)
-                .attr("cy", padding);
+                .attr("cy", padding)
+              .transition()
+            .delay(minutes)
+                .duration(2000)
+                .style("fill", "black");;
 
             // Add a label.
-            marker.append("svg:text")
-                .attr("x", padding + 7)
-                .attr("y", padding)
-                .attr("dy", ".31em")
-                .text(function(d) { return d.value.time; });
+            // marker.append("svg:text")
+            //     .attr("x", padding + 7)
+            //     .attr("y", padding)
+            //     .attr("dy", ".31em")
+            //     .text(function(d) { return d.value.time; });
 
             function transform(d) {
                 d = new google.maps.LatLng(d.value.location.lat, d.value.location.lon);
